@@ -9,7 +9,8 @@ BACKEND_URL = 'https://belettusense-production.up.railway.app'
 
 @app.route('/')
 def index():
-    return render_template('landing.html')
+     return render_template('FE/templates/landing.html')
+
 
 
 @app.route('/register', methods=['GET', 'POST'])
