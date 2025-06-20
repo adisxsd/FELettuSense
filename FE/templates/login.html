@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+    <form method="POST">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Masukkan username Anda">
+        
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Masukkan password Anda">
+        
+        <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </form>
+    <div class="form-footer">
+        Belum punya akun? <a href="{{ url_for('register') }}">Daftar di sini</a>.
+    </div>
+</div>
+{% endblock %}

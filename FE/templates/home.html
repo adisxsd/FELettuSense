@@ -1,0 +1,653 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Base Styles */
+    body {
+        background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    /* Hero Section */
+    .hero {
+        background: transparent;
+        color: white;
+        padding: 4rem 1rem 5rem;
+        text-align: center;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .hero-content p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* Main Container */
+    .main-container {
+        background: white;
+        border-top-left-radius: 40px;
+        border-top-right-radius: 40px;
+        padding: 3rem 1rem 4rem;
+        margin-top: -2rem;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+    }
+    
+    /* Upload Card */
+    .upload-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin: 0 auto;
+        max-width: 800px;
+    }
+    
+    .card-header {
+        padding: 1.5rem;
+        text-align: center;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .header-icon {
+        font-size: 2.5rem;
+        color: #2e8b57;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+        color: #343a40;
+    }
+    
+    .subheader {
+        color: #6c757d;
+        font-size: 1rem;
+    }
+    
+    /* Upload Area */
+    .upload-area {
+        padding: 2rem;
+    }
+    
+    .file-upload-container {
+        border: 2px dashed #ced4da;
+        border-radius: 12px;
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+        background: #f8f9fa;
+    }
+    
+    .file-upload-container.dragover {
+        border-color: #2e8b57;
+        background: rgba(46, 139, 87, 0.05);
+    }
+    
+    .upload-icon {
+        font-size: 3.5rem;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .upload-instruction {
+        font-size: 1.2rem;
+        color: #495057;
+        margin-bottom: 0.75rem;
+    }
+    
+    .browse-text {
+        color: #2e8b57;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    
+    .file-formats {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+    
+    /* File Input */
+    .file-input-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .file-label {
+        background: #2e8b57;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    .file-label:hover {
+        background: #3cb371;
+    }
+    
+    #fileInput {
+        display: none;
+    }
+    
+    .file-name {
+        font-size: 1rem;
+        color: #6c757d;
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .file-name.has-file {
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    /* Submit Button */
+    .submit-btn {
+        background: #2e8b57;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        width: 100%;
+        font-weight: 600;
+    }
+    
+    .submit-btn:hover {
+        background: #3cb371;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .submit-btn.loading {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+    
+    .btn-loading {
+        display: none;
+    }
+    
+    .submit-btn.loading .btn-loading {
+        display: block;
+    }
+    
+    .submit-btn.loading i {
+        display: none;
+    }
+    
+    .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Results Section */
+    .results {
+        padding: 2rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .results-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        color: #2e8b57;
+    }
+    
+    .results-header h3 {
+        margin: 0;
+        font-size: 1.4rem;
+    }
+    
+    .result-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    
+    @media (min-width: 768px) {
+        .result-content {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    
+    /* Image Container */
+    .image-container {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .result-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.3s;
+        cursor: zoom-in;
+    }
+    
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .image-overlay i {
+        color: white;
+        font-size: 2.5rem;
+    }
+    
+    .image-container:hover .image-overlay {
+        opacity: 1;
+    }
+    
+    /* Prediction Result */
+    .prediction-result {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .status-icon {
+        font-size: 2.5rem;
+    }
+    
+    .status-icon.healthy {
+        color: #28a745;
+    }
+    
+    .status-icon.warning {
+        color: #ffc107;
+    }
+    
+    .status-icon.danger {
+        color: #dc3545;
+    }
+    
+    .status-icon.neutral {
+        color: #6c757d;
+    }
+    
+    .prediction-text {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #343a40;
+    }
+    
+    /* Advice Box */
+    .advice-box {
+        background: #e8f4fd;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 5px solid #2e8b57;
+    }
+    
+    .advice-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        color: #2e8b57;
+    }
+    
+    .advice-header h4 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+    
+    #adviceText {
+        margin: 0;
+        color: #495057;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+    
+    /* Image Modal */
+    .image-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+    }
+    
+    .modal-content img {
+        max-width: 100%;
+        max-height: 80vh;
+        display: block;
+        border-radius: 12px;
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: -50px;
+        right: 0;
+        color: white;
+        font-size: 2.5rem;
+        cursor: pointer;
+    }
+     .custom-popup {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    max-width: 80%;
+    padding: 0 1rem;
+  }
+
+  .custom-popup .alert {
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #000;
+    opacity: 0.6;
+  }
+
+  .btn-close:hover {
+    opacity: 1;
+  }
+</style>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="custom-popup">
+      {% for message in messages %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>SOLUSI CEPAT DAUN SEHAT</h1>
+        <p>Deteksi kesehatan daun selada dengan teknologi AI</p>
+    </div>
+</section>
+
+<div class="main-container">
+    <div class="upload-card">
+        <div class="card-header">
+            <div class="header-icon">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <h2>Upload Gambar Daun Selada</h2>
+            <p class="subheader">Unggah gambar untuk analisis kesehatan instan</p>
+        </div>
+        
+        <form action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+            <div class="upload-area">
+                <div class="file-upload-container" id="dropZone">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <p class="upload-instruction">
+                        Seret & lepas gambar atau <span class="browse-text" id="browseText">klik untuk memilih</span>
+                    </p>
+                    <p class="file-formats">Format yang didukung: JPG, PNG, JPEG</p>
+
+                    <div class="file-input-wrapper">
+                        <label for="fileInput" class="file-label">
+                            <i class="fas fa-folder-open"></i> Pilih File
+                        </label>
+                        <input type="file" id="fileInput" name="file" accept="image/*" required>
+                        <span class="file-name" id="fileName">Tidak ada file yang dipilih</span>
+                    </div>
+                </div>
+
+                <!-- Preview sebelum submit -->
+                <img id="imagePreview" style="display:none; max-width: 300px; margin: 1rem auto;" />
+
+                <button type="submit" class="submit-btn" id="predictBtn">
+                    <i class="fas fa-search"></i> Prediksi Sekarang
+                    <div class="btn-loading">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </div>
+        </form>
+
+        {% if prediction %}
+        <div class="results" id="resultsSection" style="display: block;">
+            <div class="results-header">
+                <i class="fas fa-chart-line"></i>
+                <h3>Hasil Analisis</h3>
+            </div>
+            <div class="result-content">
+                {% if image_url %}
+                <div class="image-container">
+                    <img src="{{ image_url }}" alt="Hasil Prediksi" class="result-image" id="resultImage">
+                    <div class="image-overlay">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="result-text-section">
+                    <div class="prediction-result" id="predictionResult">
+                        <div class="status-icon">
+                            {% if 'Sehat (Fully Nutritional)' in prediction %}
+                                <i class="fas fa-check-circle healthy"></i>
+                            {% elif 'Kekurangan Kalium (K)' in prediction %}
+                                <i class="fas fa-exclamation-circle warning"></i>
+                            {% elif 'Kekurangan Nitrogen (N)' in prediction %}
+                                <i class="fas fa-times-circle danger"></i>
+                            {% elif 'Kekurangan Fosfor (P)' in prediction %}
+                                <i class="fas fa-times-circle danger"></i>    
+                            {% else %}
+                                <i class="fas fa-question-circle neutral"></i>
+                            {% endif %}
+                        </div>
+                        <p class="prediction-text">{{ prediction }}</p>
+                    </div>
+
+                    <div class="advice-box" id="adviceBox">
+                        <div class="advice-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h4>Rekomendasi</h4>
+                        </div>
+                        <p id="adviceText">
+                            {% if 'Sehat (Fully Nutritonal)' in prediction %}
+                                ✅ Tips:  
+                                Pertahankan praktik pemupukan yang sedang dilakukan saat ini karena tanaman sudah dalam kondisi gizi optimal.  
+                                Lanjutkan pengamatan secara rutin untuk mendeteksi perubahan dini yang dapat mempengaruhi kondisi tanaman.  
+                                Jaga keseimbangan air agar tanaman tidak kekurangan ataupun kelebihan air, dan cegah serangan hama maupun penyakit dengan pemantauan intensif.  
+                                Terapkan rotasi tanaman secara berkala untuk menjaga kesuburan tanah jangka panjang dan mencegah penurunan kualitas lahan.  
+                                Dengan melakukan hal-hal ini, tanaman akan terus tumbuh sehat dan produktif.
+
+                                {% elif 'Kekurangan Nitrogen (N)' in prediction %}
+                                ✅ Tips:  
+                                Tambahkan pupuk dengan kandungan tinggi nitrogen untuk memenuhi kebutuhan tanaman yang kekurangan unsur ini. Beberapa opsi pupuk yang bisa digunakan antara lain:  
+                                <ul>
+                                <li>Kalsium nitrat (Ca(NO₃)₂), yang mudah diserap dan cepat menambah nutrisi nitrogen.</li>
+                                <li>Urea (khusus untuk budidaya non-hidroponik), sebagai sumber nitrogen yang ekonomis dan efektif.</li>
+                                <li>Amonium nitrat (NH₄NO₃), untuk peningkatan pertumbuhan daun dan batang.</li>
+                                </ul>
+                                Selain itu, pastikan juga pengelolaan air dan pemantauan kondisi lain agar tanaman dapat memaksimalkan penyerapan nutrisi.
+
+                                {% elif 'Kekurangan Fosfor (P)' in prediction %}
+                                ✅ Tips:  
+                                Untuk mengatasi kekurangan fosfor, tambahkan sumber pupuk yang kaya fosfor, seperti:  
+                                <ul>
+                                <li>Monoammonium phosphate (MAP), yang membantu memperkuat sistem akar dan meningkatkan metabolisme tanaman.</li>
+                                <li>Potassium phosphate (KH₂PO₄), juga memberikan kalium tambahan yang baik untuk kekuatan dan ketahanan tanaman.</li>
+                                </ul>
+                                Fosfor sangat penting untuk pembentukan akar yang kuat dan proses reproduksi tanaman, jadi pastikan pemberiannya tepat waktu agar pertumbuhan optimal.
+
+                                {% elif 'Kekurangan Kalium (K)' in prediction %}
+                                ✅ Tips:  
+                                Tambahkan pupuk tinggi kalium untuk memperbaiki kondisi tanaman yang kekurangan unsur kalium. Pilihan pupuk yang bisa dipakai antara lain:  
+                                <ul>
+                                <li>Kalium nitrat (KNO₃), yang membantu meningkatkan ketahanan tanaman terhadap stres dan penyakit.</li>
+                                <li>Kalium sulfat (K₂SO₄), berfungsi memperbaiki kualitas buah dan meningkatkan efisiensi penggunaan air.</li>
+                                </ul>
+                                Kalium juga berperan dalam regulasi keseimbangan air dan proses fotosintesis, sehingga penting untuk memenuhi kebutuhan nutrisinya.
+
+                                {% else %}
+                                Mohon pastikan gambar yang Anda unggah jelas dan sesuai agar proses prediksi dapat berjalan dengan optimal. Jika masih mengalami kendala, silakan ulangi proses prediksi dengan gambar lain yang representatif.
+                                {% endif %}
+
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.getElementById("fileInput").addEventListener("change", function(e) {
+        const [file] = this.files;
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById("imagePreview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const dropZone = document.getElementById('dropZone');
+        const browseText = document.getElementById('browseText');
+        const predictBtn = document.getElementById('predictBtn');
+        const uploadForm = document.getElementById('uploadForm');
+
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) {
+                fileName.textContent = fileInput.files[0].name;
+                fileName.classList.add('has-file');
+            } else {
+                fileName.textContent = 'Tidak ada file yang dipilih';
+                fileName.classList.remove('has-file');
+            }
+        });
+
+        browseText.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', function () {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileName.textContent = fileInput.files[0].name;
+                fileName.classList.add('has-file');
+            }
+        });
+
+        uploadForm.addEventListener('submit', function () {
+            predictBtn.classList.add('loading');
+        });
+
+        const resultImage = document.getElementById('resultImage');
+        if (resultImage) {
+            resultImage.addEventListener('click', function () {
+                const modal = document.createElement('div');
+                modal.className = 'image-modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <img src="${this.src}" alt="Full size preview">
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                modal.querySelector('.close-modal').addEventListener('click', function () {
+                    modal.remove();
+                });
+            });
+        }
+    });
+</script>
+
+{% endblock %}

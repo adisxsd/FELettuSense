@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5" style="max-width: 900px;">
+    <h2 class="mb-4 text-center">Riwayat Prediksi</h2>
+
+    {% if riwayat and riwayat|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Gambar</th>
+                    <th scope="col">Hasil Prediksi</th>
+                    <th scope="col">Waktu (GMT+7)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in riwayat %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <img src="{{ backend_url }}/uploads/{{ item.filename }}" alt="Image" class="img-thumbnail" style="max-width: 120px;">
+                    </td>
+                    <td class="fw-semibold">{{ item.prediction }}</td>
+                    <td>
+                        {% if item.timestamp %}
+                            {{ item.timestamp | to_gmt7 }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Tidak ada data riwayat yang tersedia.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
